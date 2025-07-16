@@ -41,19 +41,3 @@ const pathToCLI = require('./lib/cargo-bin');
     core.debug(`cargo command exited with code ${exitCode}.`);
   }
 })();
-```
-
----
-
-#### `wrapper/lib/cargo-bin.js`
-Helper to locate the real `cargo-bin` executable path.
-
-```javascript
-/**
- * Copyright (c) <Your Name/Org>
- * SPDX-License-Identifier: MIT
- */
-
-// This simply returns the path to the real binary, which was
-// exported as an environment variable by the main setup script.
-module.exports = process.env.CARGO_BIN_PATH;

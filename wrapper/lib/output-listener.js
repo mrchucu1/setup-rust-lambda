@@ -12,7 +12,6 @@ class OutputListener {
   get listener () {
     const listen = function listen (data) {
       this._buff.push(data);
-
       if (this._streamWriter) {
         this._streamWriter.write(data);
       }

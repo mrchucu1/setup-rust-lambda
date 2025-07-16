@@ -70,3 +70,7 @@ Desktop.ini
 # Other
 *.iml
 *.bak
+
+dist/
+
+wrapper/dist/
