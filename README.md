@@ -56,7 +56,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Rust and cargo-lambda
-        uses: mrchucu1/setup-rust-lambda@v1
+        uses: mrchucu1/setup-rust-lambda@v0.3.0
         with:
           cargo-lambda-version: 'latest'
 
