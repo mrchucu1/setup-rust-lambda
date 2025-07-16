@@ -1,6 +1,6 @@
 # setup-rust-lambda Action
 
-[![Continuous Integration](https://github.com/mrchucu1/setup-rust-lambda/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/mrchucu1/setup-rust-lambda/actions/workflows/continuous-integration.yml)
+[![Continuous Integration](https://github.com/mrchucu1/setup-rust-lambda/actions/workflow/ci.yml/badge.svg)](https://github.com/mrchucu1/setup-rust-lambda/actions/workflows/ci.yml)
 
 The `setup-rust-lambda` action sets up a Rust and `cargo-lambda` toolchain in your GitHub Actions workflow by:
 
