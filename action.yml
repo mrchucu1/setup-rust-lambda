@@ -1,0 +1,26 @@
+name: 'Setup Rust Lambda Toolchain'
+description: 'Sets up the Rust and cargo-lambda toolchain in your GitHub Actions workflow.'
+author: 'Your GitHub Username/Org'
+inputs:
+  rust-version:
+    description: 'The version of the Rust toolchain to install (e.g., stable, nightly, 1.70.0). Defaults to `stable`.'
+    default: 'stable'
+    required: false
+  rust-target:
+    description: 'The Rust target to install for cross-compilation. Defaults to `x86_64-unknown-linux-musl` for AWS Lambda.'
+    default: 'x86_64-unknown-linux-musl'
+    required: false
+  cargo-lambda-version:
+    description: 'The version of cargo-lambda to install. A value of `latest` will install the latest version. Defaults to `latest`.'
+    default: 'latest'
+    required: false
+  cargo-wrapper:
+    description: 'Whether to install a wrapper to wrap subsequent calls of the `cargo` binary and expose its STDOUT, STDERR, and exit code as outputs. Defaults to `true`.'
+    default: 'true'
+    required: false
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+branding:
+  icon: 'package'
+  color: 'orange'
