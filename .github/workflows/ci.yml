@@ -16,6 +16,6 @@ jobs:
       - name: Run a test command inside the container
         uses: ./
         with:
-          command: 'cargo-lambda -V'
+          command: 'cargo lambda -V'
           rust_version: '1.88.0'
           cargo_lambda_version: '1.8.5'
