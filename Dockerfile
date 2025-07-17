@@ -7,7 +7,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     gcc \
     libc6-dev \
+    tar \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fLO "https://ziglang.org/builds/zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz"
+RUN tar -xJf "zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz" -C /usr/bin
+RUN rm -rf "zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz"
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
