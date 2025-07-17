@@ -7,18 +7,18 @@ branding:
   color: 'orange'
 
 inputs:
-  rust-version:
+  rust_version:
     description: 'The version of the Rust toolchain to use (e.g., stable, 1.78.0).'
     required: false
     default: 'stable'
-  rust-target:
+  rust_target:
     description: 'The Rust target for cross-compilation.'
     required: false
     default: 'x86_64-unknown-linux-musl'
-  cargo-lambda-version:
+  cargo_lambda_version:
     description: 'The version of cargo-lambda to install (e.g., 1.2.0).'
     required: false
-    default: '1.2.0'
+    default: '1.8.5'
   command:
     description: 'The command to execute inside the container (e.g., "cargo test --release").'
     required: true
