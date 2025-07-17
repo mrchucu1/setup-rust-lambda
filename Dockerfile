@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN curl -fLO "https://ziglang.org/builds/zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz"
 RUN tar -xJf "zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz"
-RUN cp zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b/zig /usr/bin/
+RUN mv zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b/zig zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b/lib/ /usr/bin/
 RUN rm -rf "zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b.tar.xz" "zig-x86_64-linux-0.15.0-dev.1084+dbe0e0c1b"
 
 ENV RUSTUP_HOME=/usr/local/rustup \
