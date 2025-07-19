@@ -35,12 +35,12 @@ on:
     branches: ["main"]
 
 permissions:
-  id-token: write # Required for OIDC
+  id-token: write
   contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  AWS_REGION: "us-east-1"
+  AWS_REGION: "us-east-2"
 
 jobs:
   build-and-deploy:
@@ -55,11 +55,6 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.IAM_ROLE_NAME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Rust and cargo-lambda
-        uses: mrchucu1/setup-rust-lambda@v0.3.0
-        with:
-          cargo-lambda-version: 'latest'
-
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -69,40 +64,31 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Run tests
-        id: test
-        run: cargo test --release
-        continue-on-error: true # Allow deployment even if tests fail on a push to main, for example
-
-      - name: Build Lambda function
-        id: build
-        run: cargo lambda build --release --output-format zip
-
-      # Deployment step only runs on pushes to the 'main' branch
-      - name: Deploy Lambda function
-        id: deploy
+      - name: Test and Build Code & Deploy Lambda function
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          cargo lambda deploy \
-            --iam-role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/YourLambdaExecutionRole \
-            my-rust-lambda
+        uses: mrchucu1/setup-rust-lambda@v0.5.2
+        id: deploy
+        with:
+          command: |
+            cargo test && cargo lambda build --release && \
+            cargo lambda deploy \
+              --description "${{ github.sha }}" \
+              --binary-path $PWD/target/lambda/<your-package-name>/boostrap \
+              --iam-role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/<lambda-function-role> \
+              <lambda-function-name>
 
-      - name: Print outputs from steps
-        if: always() # Run this even if previous steps fail
-        run: |
-          echo "--- Test Output ---"
-          echo "Exit Code: ${{ steps.test.outputs.exitcode }}"
-          echo "STDOUT: ${{ steps.test.outputs.stdout }}"
-          echo "--- Deploy Output ---"
-          echo "Exit Code: ${{ steps.deploy.outputs.exitcode }}"
-          echo "STDOUT: ${{ steps.deploy.outputs.stdout }}"
-
+      - name: Test and Build Code & skip deploy
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        uses: mrchucu1/setup-rust-lambda@v0.5.2
+        id: deploy
+        with:
+          command: cargo test && cargo lambda build --release
 ```
 
 ## Inputs
 
 - `rust-version`: (Optional) The Rust toolchain version. Defaults to `stable`.
-- `rust-target`: (Optional) The Rust cross-compilation target. Defaults to `x86_64-unknown-linux-musl`. Use `aarch64-unknown-linux-gnu` for ARM/Graviton2 Lambdas.
+<!-- `rust-target`: (Optional) The Rust cross-compilation target. Defaults to `x86_64-unknown-linux-musl`. Use `aarch64-unknown-linux-gnu` for ARM/Graviton2 Lambdas. -->
 - `cargo-lambda-version`: (Optional) The version of `cargo-lambda` to install. Defaults to `latest`.
 - `cargo-wrapper`: (Optional) Whether to install the `cargo` wrapper. Defaults to `true`.
 
