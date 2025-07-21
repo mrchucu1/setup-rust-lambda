@@ -73,7 +73,7 @@ jobs:
             cargo test && cargo lambda build --release && \
             cargo lambda deploy \
               --description "${{ github.sha }}" \
-              --binary-path $PWD/target/lambda/<your-package-name>/boostrap \
+              --binary-path ./target/lambda/<your-package-name>/bootstrap \
               --iam-role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/<lambda-function-role> \
               <lambda-function-name>
 
