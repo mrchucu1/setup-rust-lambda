@@ -16,6 +16,15 @@ jobs:
       - name: Run a test command inside the container
         uses: ./
         with:
-          command: 'cargo lambda -V'
           rust_version: '1.88.0'
           cargo_lambda_version: '1.8.5'
+          command: |
+            cargo lambda -V && \
+            cd examples/test-compilation/ &&
+            cargo lambda build --release --output-format zip
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-target-zip
+          path: |
+            examples/test-compilation/target/lambda/test-compilation/

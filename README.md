@@ -85,6 +85,51 @@ jobs:
           command: cargo test && cargo lambda build --release
 ```
 
+
+```yaml
+name: Build and return artifacts
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ["*"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Test and Build Code & Deploy Lambda function
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: mrchucu1/setup-rust-lambda@v0.5.2
+        id: deploy
+        with:
+          command: |
+            cargo test && cargo lambda build --release --output-format zip \
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-target-zip
+          path: |
+            target/lambda/<your-build-name>/
+```
+
 ## Inputs
 
 - `rust-version`: (Optional) The Rust toolchain version. Defaults to `stable`.
