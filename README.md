@@ -84,7 +84,7 @@ jobs:
         with:
           command: cargo test && cargo lambda build --release
 ```
-
+### Saving built binaries 
 
 ```yaml
 name: Build and return artifacts
