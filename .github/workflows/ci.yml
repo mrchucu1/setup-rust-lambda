@@ -21,11 +21,12 @@ jobs:
           command: |
             cargo lambda -V && \
             cd examples/test-compilation/ &&
-            cargo lambda build --release --output-format zip > out.log 2> error.log &&
-            [ -e "$PWD/error.log" ] && [ ! -s "$PWD/error.log" ] && [ -f "$PWD/out.log" ] && echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" || [ -f "$PWD/error.log" ] && echo "# Failed with error \n <pre>$(cat error.log)</pre>" >> "$GITHUB_STEP_SUMMARY"
+            cargo lambda build --release --output-format zip > /dev/null 2> out.log &&
+            [ $? -e 0 ] && echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" || echo "# Failed with error \n <pre>$(cat out.log)</pre>" >> "$GITHUB_STEP_SUMMARY" &&
+            [ $? -ne 0 ] && echo -n "0" > failed
       - name: Archive production artifacts
+        if: false
         uses: actions/upload-artifact@v4
-        if: ${{ env.GITHUB_ACTIONS_RUNNER != 'act' }}
         with:
           name: lambda-target-zip
           path: |
@@ -33,3 +34,5 @@ jobs:
       - name: Echo output on ACT
         if: ${{ env.GITHUB_ACTIONS_RUNNER == 'act' }}
         run: echo "$GITHUB_STEP_SUMMARY"
+      - name: Fail job if flag exists
+        run: bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && exit 1"
