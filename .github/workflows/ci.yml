@@ -21,11 +21,15 @@ jobs:
           command: |
             cargo lambda -V && \
             cd examples/test-compilation/ &&
-            cargo lambda build --release --output-format zip >> out.log 2> err.log &&
-            [ -f err.log ] && echo "# Failed with error \n <pre>$(cat err.log)</pre>" >> "$GITHUB_STEP_SUMMARY" || echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY"
+            cargo lambda build --release --output-format zip > out.log 2> error.log &&
+            [ -e "$PWD/error.log" ] && [ ! -s a "$PWD/error.log" ] && [ -f "$PWD/out.log" ] && echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" || [ -f "$PWD/error.log" ] && echo "# Failed with error \n <pre>$(cat error.log)</pre>" >> "$GITHUB_STEP_SUMMARY"
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
+        if: ${{ env.GITHUB_ACTIONS_RUNNER != 'act' }}
         with:
           name: lambda-target-zip
           path: |
             examples/test-compilation/target/lambda/test-compilation/
+      - name: Echo output on ACT
+        if: ${{ env.GITHUB_ACTIONS_RUNNER == 'act' }}
+        run: echo "$GITHUB_STEP_SUMMARY"
