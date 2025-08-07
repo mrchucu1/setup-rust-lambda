@@ -21,9 +21,13 @@ jobs:
           command: |
             cargo lambda -V && \
             cd examples/test-compilation/ &&
+            echo "Starting Compilation" &&
             cargo lambda build --release --output-format zip > /dev/null 2> out.log &&
-            [ $? -e 0 ] && echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" || echo "# Failed with error \n <pre>$(cat out.log)</pre>" >> "$GITHUB_STEP_SUMMARY" &&
-            [ $? -ne 0 ] && echo -n "0" > failed
+            COMPILATION_EXIT_CODE=$? &&
+            [ $COMPILATION_EXIT_CODE -eq 0 ] &&
+            echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" ||
+            echo "# Failed with error \n <pre>$(cat out.log)</pre>" >> "$GITHUB_STEP_SUMMARY" &&
+            echo -n "0" > failed
       - name: Archive production artifacts
         if: false
         uses: actions/upload-artifact@v4
