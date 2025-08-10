@@ -11,6 +11,8 @@ The `setup-rust-lambda` action sets up a Rust and `cargo-lambda` toolchain in yo
 
 After using this action, subsequent steps can run `cargo test`, `cargo lambda build`, and `cargo lambda deploy` seamlessly, just like on your local machine.
 
+<!--TODO: Fix actions pipeline-->
+
 ## Usage
 
 This action can be run on `ubuntu-latest`, `windows-latest`, and `macos-latest` GitHub Actions runners.
