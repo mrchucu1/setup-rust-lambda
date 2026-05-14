@@ -13,24 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Remove any leftover failure marker
-        run: rm -f examples/test-compilation/failed
-
-      - name: Run a test command inside the container
+      - name: Build and test compilation
         uses: ./
         with:
           rust_version: '1.95.0'
           cargo_lambda_version: '1.9.1'
           command: |
-            set +e
             cd examples/test-compilation/ || exit 1
-            ls -lah
-            bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && echo \"WTF\""
             echo "Starting Compilation"
             cargo lambda -V
+            # Capture build output
             cargo lambda build --release --output-format zip > /dev/null 2> out.log
             BUILD_EXIT=$?
 
+            # Always write the full log to the step summary
             if [ $BUILD_EXIT -eq 0 ]; then
               {
                 printf "# Compiled successfully\n"
@@ -38,8 +34,6 @@ jobs:
                 sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' out.log
                 printf "</pre>\n</details>\n"
               } >> "$GITHUB_STEP_SUMMARY"
-              rm -f failed
-              [ -f failed ] && rm -f "$(pwd)/failed"
             else
               {
                 printf "# Failed with error\n"
@@ -47,8 +41,10 @@ jobs:
                 sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' out.log
                 printf "</pre>\n"
               } >> "$GITHUB_STEP_SUMMARY"
-              echo "Compilation failed" > failed
             fi
+
+            # Exit with the build's exit code, making the whole step fail on error
+            exit $BUILD_EXIT
 
       - name: Archive production artifacts
         if: false
@@ -61,6 +57,3 @@ jobs:
       - name: Echo output on ACT
         if: ${{ env.GITHUB_ACTIONS_RUNNER == 'act' }}
         run: echo "$GITHUB_STEP_SUMMARY"
-
-      - name: Fail job if flag exists
-        run: bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && exit 1"
