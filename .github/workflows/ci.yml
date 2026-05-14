@@ -25,7 +25,7 @@ jobs:
             set +e
             cd examples/test-compilation/ || exit 1
             ls -lah
-            bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && echo "WTF"
+            bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && echo \"WTF\""
             echo "Starting Compilation"
             cargo lambda -V
             cargo lambda build --release --output-format zip > /dev/null 2> out.log
