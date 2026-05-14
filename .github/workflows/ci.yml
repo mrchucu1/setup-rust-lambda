@@ -23,6 +23,7 @@ jobs:
           cargo_lambda_version: '1.9.1'
           command: |
             set +e
+            bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && echo "This will fail"
             cd examples/test-compilation/ || exit 1
             echo "Starting Compilation"
             cargo lambda -V
