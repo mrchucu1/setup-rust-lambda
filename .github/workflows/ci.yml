@@ -13,13 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Remove any leftover failure marker
+        run: rm -f examples/test-compilation/failed
+
       - name: Run a test command inside the container
         uses: ./
         with:
           rust_version: '1.95.0'
           cargo_lambda_version: '1.9.1'
           command: |
-            set +e   # do not exit on error; we handle it manually
+            set +e
             cd examples/test-compilation/ || exit 1
             echo "Starting Compilation"
             cargo lambda -V
@@ -30,20 +33,20 @@ jobs:
               {
                 printf "# Compiled successfully\n"
                 printf "<details><summary>Output:</summary>\n<pre>\n"
-                cat out.log | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
+                sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' out.log
                 printf "</pre>\n</details>\n"
               } >> "$GITHUB_STEP_SUMMARY"
-              rm -f failed        # make absolutely sure no stale flag remains
+              rm -f failed
+              [ -f failed ] && rm -f "$(pwd)/failed"
             else
               {
                 printf "# Failed with error\n"
                 printf "<pre>\n"
-                cat out.log | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
+                sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' out.log
                 printf "</pre>\n"
               } >> "$GITHUB_STEP_SUMMARY"
               echo "Compilation failed" > failed
             fi
-            exit 0   # step passes, the flag file controls final job outcome
 
       - name: Archive production artifacts
         if: false
