@@ -8,7 +8,7 @@ branding:
 
 inputs:
   rust_version:
-    description: 'The version of the Rust toolchain to use (e.g., stable, 1.78.0).'
+    description: 'The version of the Rust toolchain to use (e.g., stable, 1.95.0).'
     required: false
     default: 'stable'
   rust_target:
@@ -18,7 +18,7 @@ inputs:
   cargo_lambda_version:
     description: 'The version of cargo-lambda to install (e.g., 1.2.0).'
     required: false
-    default: '1.8.5'
+    default: '1.9.1'
   command:
     description: 'The command to execute inside the container (e.g., "cargo test --release").'
     required: true

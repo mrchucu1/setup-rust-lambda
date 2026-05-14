@@ -1,10 +1,10 @@
 [package]
 name = "test-compilation"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
-aws_lambda_events = { version = "0.15.1", default-features = false, features = ["s3"] }
+aws_lambda_events = { version = "1.2", default-features = false, features = ["s3"] }
 
-lambda_runtime = "0.13.0"
+lambda_runtime = "1.2.0"
 tokio = { version = "1", features = ["macros"] }

@@ -16,18 +16,35 @@ jobs:
       - name: Run a test command inside the container
         uses: ./
         with:
-          rust_version: '1.88.0'
-          cargo_lambda_version: '1.8.5'
+          rust_version: '1.95.0'
+          cargo_lambda_version: '1.9.1'
           command: |
-            cargo lambda -V && \
-            cd examples/test-compilation/ &&
-            echo "Starting Compilation" &&
-            cargo lambda build --release --output-format zip > /dev/null 2> out.log &&
-            COMPILATION_EXIT_CODE=$? &&
-            [ $COMPILATION_EXIT_CODE -eq 0 ] &&
-            echo -n "# Compiled sucessfully \n<summary>Output: <details><pre>$(cat out.log)</pre></details><summary>" >> "$GITHUB_STEP_SUMMARY" ||
-            echo "# Failed with error \n <pre>$(cat out.log)</pre>" >> "$GITHUB_STEP_SUMMARY" &&
-            echo -n "0" > failed
+            set +e   # do not exit on error; we handle it manually
+            cd examples/test-compilation/ || exit 1
+            echo "Starting Compilation"
+            cargo lambda -V
+            cargo lambda build --release --output-format zip > /dev/null 2> out.log
+            BUILD_EXIT=$?
+
+            if [ $BUILD_EXIT -eq 0 ]; then
+              {
+                printf "# Compiled successfully\n"
+                printf "<details><summary>Output:</summary>\n<pre>\n"
+                cat out.log | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
+                printf "</pre>\n</details>\n"
+              } >> "$GITHUB_STEP_SUMMARY"
+              rm -f failed        # make absolutely sure no stale flag remains
+            else
+              {
+                printf "# Failed with error\n"
+                printf "<pre>\n"
+                cat out.log | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
+                printf "</pre>\n"
+              } >> "$GITHUB_STEP_SUMMARY"
+              echo "Compilation failed" > failed
+            fi
+            exit 0   # step passes, the flag file controls final job outcome
+
       - name: Archive production artifacts
         if: false
         uses: actions/upload-artifact@v4
@@ -35,8 +52,10 @@ jobs:
           name: lambda-target-zip
           path: |
             examples/test-compilation/target/lambda/test-compilation/
+
       - name: Echo output on ACT
         if: ${{ env.GITHUB_ACTIONS_RUNNER == 'act' }}
         run: echo "$GITHUB_STEP_SUMMARY"
+
       - name: Fail job if flag exists
         run: bash -c "[ -f \"$PWD/examples/test-compilation/failed\" ] && exit 1"
