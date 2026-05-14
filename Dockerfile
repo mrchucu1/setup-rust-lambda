@@ -14,8 +14,8 @@ RUN apt-get update && \
      && rm -rf /var/lib/apt/lists/*
 
 # Security best practice: Add checksum verification for Zig download
-ARG ZIG_URL="https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz"
-ARG ZIG_SHA256="24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c"
+ARG ZIG_URL="https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz"
+ARG ZIG_SHA256="70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00"
 RUN curl -fLO "${ZIG_URL}" && \
     echo "${ZIG_SHA256}  $(basename ${ZIG_URL})" | sha256sum -c - && \
     tar -xJf "$(basename ${ZIG_URL})" && \
